@@ -25,7 +25,7 @@ public class Util {
      * @return the largest of values.
      */
     public static int max(int[] values) {
-        var max = values[0];
+        int max = values[0];
         for (int value:
              values) {
             max=value>max?value:max;
