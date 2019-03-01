@@ -26,9 +26,9 @@ public class Util {
      */
     public static int max(int[] values) {
         int max = values[0];
-        for (int value:
-             values) {
-            max=value>max?value:max;
+        for (int value :
+            values) {
+            max = value > max ? value : max;
         }
         return max;
     }
@@ -41,9 +41,9 @@ public class Util {
      */
     public static long sum(int[] values) {
         long sum = 0;
-        for (int value:
-        values){
-            sum+=value;
+        for (int value :
+            values) {
+            sum += value;
         }
         return sum;
     }
