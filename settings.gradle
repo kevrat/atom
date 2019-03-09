@@ -1,0 +1,3 @@
+include 'homeworks:HW2'
+findProject(':homeworks:HW2')?.name = 'HW2'
+
