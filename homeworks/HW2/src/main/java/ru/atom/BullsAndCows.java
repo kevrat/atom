@@ -43,10 +43,9 @@ public class BullsAndCows {
     }
 
     public static int getBulls(String secret, String guess) {
-        int bulls=0;
-        for(int i = 0; i < Math.min(secret.length(), guess.length()); i++)
-        {
-            if(secret.charAt(i)==guess.charAt(i)){
+        int bulls = 0;
+        for (int i = 0; i < Math.min(secret.length(), guess.length()); i++) {
+            if (secret.charAt(i) == guess.charAt(i)) {
                 bulls++;
             }
         }
@@ -56,8 +55,7 @@ public class BullsAndCows {
 
     public static int getCows(String secret, String guess) {
         int cows = 0;
-        for(int i = 0; i < guess.length(); i++)
-        {
+        for (int i = 0; i < guess.length(); i++) {
             if (secret.indexOf(guess.charAt(i)) > -1)
                 cows++;
         }
