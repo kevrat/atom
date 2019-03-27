@@ -66,35 +66,55 @@ public class ChatController {
      * curl -i localhost:8080/chat/online
      */
     @RequestMapping(
-            path = "online",
-            method = RequestMethod.GET,
-            produces = MediaType.TEXT_PLAIN_VALUE)
+        path = "online",
+        method = RequestMethod.GET,
+        produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity online() {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//TODO
+        String responseBody = String.join("\n", usersOnline.keySet().stream().sorted().collect(Collectors.toList()));
+        return ResponseEntity.ok(responseBody);
     }
 
     /**
      * curl -X POST -i localhost:8080/chat/logout -d "name=I_AM_STUPID"
      */
     @RequestMapping(
-            path = "logout",
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        path = "logout",
+        method = RequestMethod.POST,
+        consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity logout(@RequestParam("name") String name) {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//TODO
+    public ResponseEntity<String> logout(@RequestParam("name") String name) {
+        if (!usersOnline.containsKey(name)) {
+            return ResponseEntity.badRequest().body("User '" + name  + "' was not logged in.");
+        }
+        usersOnline.remove(name);
+        messages.add("[" + name + "] logged out");
+        return ResponseEntity.ok().build();
     }
-
 
     /**
      * curl -X POST -i localhost:8080/chat/say -d "name=I_AM_STUPID&msg=Hello everyone in this chat"
      */
     @RequestMapping(
-            path = "say",
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        path = "say",
+        method = RequestMethod.POST,
+        consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity say(@RequestParam("name") String name, @RequestParam("msg") String msg) {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//TODO
+    public ResponseEntity<String> say(@RequestParam("name") String name, @RequestParam("msg") String msg) {
+        if (!usersOnline.containsKey(name)) {
+            return ResponseEntity.badRequest().body("User '" + name  + "' was not logged in.");
+        }
+        messages.add("[" + name + "]: " + msg);
+        return ResponseEntity.ok().build();
     }
+
+    @RequestMapping(
+        path = "clear",
+        method = RequestMethod.DELETE,
+        produces = MediaType.TEXT_PLAIN_VALUE
+    )
+    public ResponseEntity clear() {
+        messages.clear();
+        return ResponseEntity.noContent().build();
+    }
+
 }
