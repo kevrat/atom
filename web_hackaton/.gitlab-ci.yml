@@ -1,0 +1,31 @@
+image: docker:latest
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay
+  SPRING_PROFILES_ACTIVE: gitlab-ci
+
+stages:
+  - testing
+  - build
+
+test unit:
+  image: gradle:4.5.1-jdk10
+  stage: testing
+  script:
+    - mkdir -p .ci_status
+    - ./gradlew test
+    - echo "test unit"
+    - touch .ci_status/test_unit
+
+docker-build:
+  stage: build
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker push "$CI_REGISTRY_IMAGE"
+    - mkdir -p .ci_status
+    - echo "Build"
+    - touch .ci_status/build_success
