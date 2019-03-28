@@ -32,6 +32,15 @@
     padding: 10px;
     padding-top: 0;
     padding-bottom: 30px; /* Height of the footer */
+    display: flex;
+}
+#history {
+    width: 80%;
+}
+
+#users {
+    width: 20%;
+    background: cadetblue;
 }
 
 #footer {
