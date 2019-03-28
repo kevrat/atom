@@ -4,13 +4,17 @@
 <html>
 <body>
 <div id="header">
-    <form method="POST" id="nameform" action="javascript:void(null);" onsubmit="login()">
+    <form method="POST" id="nameform" action="javascript:void(null);" >
         <input id="name" name="name" value="" style="font-size:medium" type="text">
-        <input value="Login" style="font-size:large" type="submit">
+        <input value="Login" style="font-size:large" type="submit" onclick="login()">
+        <input value="Logout" style="font-size:large" onclick="logout()" type="submit">
     </form>
 </div>
 <div id="body">
     <div id="history" class="chat form"></div>
+    <div id="users" class="chat form">
+        users online
+    </div>
 </div>
 <div id="footer">
     <form method="POST" id="msgform" action="javascript:void(null);" onsubmit="say()">
@@ -37,6 +41,20 @@
         $.ajax(settings).done(function (response) {
             $("#history").html(response.replace(/\n/g, "<br />"))
             $("#history").scrollTop($("#history")[0].scrollHeight);
+        }).fail(function (jqXHR, textStatus) {
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
+    }
+    function loadUsers() {
+        var settings = {
+            "crossDomain": true,
+            "url": "http://" + host + ":" + port + "/chat/online",
+            "method": "GET",
+        }
+
+        $.ajax(settings).done(function (response) {
+            $("#users").html("Users online: <br/>"+response.replace(/\n/g, "<br />"))
+            $("#users").scrollTop($("#users")[0].scrollHeight);
         }).fail(function (jqXHR, textStatus) {
             console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
         });
@@ -79,7 +97,27 @@
             console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
         });
     }
+    function logout() {
+        var name = $('#nameform').serialize();
+
+        var settings = {
+            "method": "POST",
+            "crossDomain": true,
+            "url": "http://" + host + ":" + port + "/chat/logout",
+            "data": name
+        };
+
+        $.ajax(settings).done(function (response) {
+            loadHistory();
+            loadUsers();
+        }).fail(function (jqXHR, textStatus) {
+            alert(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
+    }
 
     loadHistory();
-    setInterval(loadHistory, 10000);
+    loadUsers();
+    setInterval(loadHistory, 1000);
+    setInterval(loadUsers, 1000);
 </script>
