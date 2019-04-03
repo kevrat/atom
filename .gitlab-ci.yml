@@ -11,7 +11,7 @@ stages:
   - build
 
 test unit:
-  image: gradle:4.5.1-jdk10
+  image: gradle:4.10.2-jdk11-slim
   stage: testing
   script:
     - mkdir -p .ci_status
