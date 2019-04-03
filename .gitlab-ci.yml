@@ -11,7 +11,7 @@ stages:
   - build
 
 test unit:
-  image: gradle:alpine
+  image: gradle:jdk-alpine
   stage: testing
   script:
     - mkdir -p .ci_status
