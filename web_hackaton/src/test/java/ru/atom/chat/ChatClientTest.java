@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ChatApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+//@SpringBootTest(classes = {ChatApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 
 public class ChatClientTest {
     private static final Logger log = LoggerFactory.getLogger(ChatClientTest.class);

@@ -1,0 +1,35 @@
+version: '3.2'
+services:
+  atom:
+    build: ./
+    restart: always
+    networks:
+      - back-tier
+    ports:
+      - "80:80"
+  mysql:
+    image: mysql:5.5
+    restart: always
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    networks:
+      - back-tier
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - '8088:80'
+    networks:
+      - back-tier
+volumes:
+  mysql:
+  backup-mysql:
+networks:
+  back-tier:
+  # front-tier:

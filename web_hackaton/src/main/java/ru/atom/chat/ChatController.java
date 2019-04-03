@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import org.hibernate.Session;
+
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,6 +48,16 @@ public class ChatController {
             return ResponseEntity.badRequest().body("Already logged in:(");
         }
         usersOnline.put(name, name);
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        MessageEntity messageEntity = new MessageEntity();
+
+        messageEntity.setBody("[" + name + "] logged in");
+        session.save(messageEntity);
+        session.getTransaction().commit();
+
+        session.close();
         messages.add("[" + name + "] logged in");
         return ResponseEntity.ok().build();
     }
@@ -56,8 +70,11 @@ public class ChatController {
             method = RequestMethod.GET,
             produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> chat() {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        List<MessageEntity> messages = session.createCriteria(MessageEntity.class).list();
+        session.close();
         return new ResponseEntity<>(messages.stream()
-                .map(Object::toString)
+                .map(object -> object.getBody())
                 .collect(Collectors.joining("\n")),
                 HttpStatus.OK);
     }
@@ -103,6 +120,16 @@ public class ChatController {
         if (!usersOnline.containsKey(name)) {
             return ResponseEntity.badRequest().body("User '" + name  + "' was not logged in.");
         }
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        MessageEntity messageEntity = new MessageEntity();
+
+        messageEntity.setBody("[" + name + "]: " + msg);
+        session.save(messageEntity);
+        session.getTransaction().commit();
+
+        session.close();
         messages.add("[" + name + "]: " + msg);
         return ResponseEntity.ok().build();
     }
