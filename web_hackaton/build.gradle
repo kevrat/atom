@@ -13,6 +13,7 @@ apply plugin: 'jacoco'
 apply plugin: "io.spring.dependency-management"
 
 dependencies {
+    compile group: 'javax.persistence', name: 'persistence-api'
 
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
     compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
