@@ -3,7 +3,7 @@ stages:
   - build
 
 test unit:
-  image: gradle:jdk
+  image: mysql
   services:
     - mysql:latest
   stage: testing
@@ -13,6 +13,7 @@ test unit:
     MYSQL_USER: atom
     MYSQL_PASSWORD: atom
   script:
+    - echo "SELECT 'OK';" | mysql --user=root --password=atom --host=mysql atom
     - mkdir -p .ci_status
     - cd web_hackaton
     - ./gradlew check
