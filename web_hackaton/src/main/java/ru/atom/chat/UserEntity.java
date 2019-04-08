@@ -1,6 +1,10 @@
 package ru.atom.chat;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.Basic;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -57,10 +61,10 @@ public class UserEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserEntity that = (UserEntity) o;
-        return id == that.id &&
-            Objects.equals(nickname, that.nickname) &&
-            Objects.equals(password, that.password) &&
-            Objects.equals(lastLogin, that.lastLogin);
+        return id == that.id
+            && Objects.equals(nickname, that.nickname)
+            && Objects.equals(password, that.password)
+            && Objects.equals(lastLogin, that.lastLogin);
     }
 
     @Override

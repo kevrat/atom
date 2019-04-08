@@ -1,7 +1,16 @@
 package ru.atom.chat;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.Basic;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import java.util.Objects;
 
 @Entity
@@ -9,10 +18,14 @@ import java.util.Objects;
 public class MessageEntity {
     private int id;
     private String body;
-    private Timestamp createdAt;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
 
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false, updatable = false)
     public int getId() {
         return id;
     }
@@ -31,28 +44,19 @@ public class MessageEntity {
         this.body = body;
     }
 
-    @Basic
-    @Column(name = "created_at", nullable = false)
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MessageEntity that = (MessageEntity) o;
-        return id == that.id &&
-            Objects.equals(body, that.body) &&
-            Objects.equals(createdAt, that.createdAt);
+        return id == that.id
+            && Objects.equals(body, that.body)
+            && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, body, createdAt);
     }
+
 }
