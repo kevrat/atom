@@ -13,7 +13,7 @@ test unit:
     MYSQL_USER: atom
     MYSQL_PASSWORD: atom
   script:
-    - echo "SELECT 'OK';" | mysql --user=root --password=atom --host=mysql atom
+    - echo "SELECT 'OK';" | mysql --user=atom --password=atom --host=mysql --port=3306 atom
     - mkdir -p .ci_status
     - cd web_hackaton
     - ./gradlew check
