@@ -1,28 +1,20 @@
-image: docker:latest
-services:
-  - docker:dind
-  - mysql:latest
-
-variables:
-  DOCKER_DRIVER: overlay
-  SPRING_PROFILES_ACTIVE: gitlab-ci
-  MYSQL_DATABASE: atom
-  MYSQL_ROOT_PASSWORD: atom
-  MYSQL_USER: atom
-  MYSQL_PASSWORD: atom
-
 stages:
   - testing
   - build
 
 test unit:
   image: gradle:jdk
+  services:
+    - mysql:latest
   stage: testing
+  variables:
+    MYSQL_DATABASE: atom
+    MYSQL_ROOT_PASSWORD: atom
+    MYSQL_USER: atom
+    MYSQL_PASSWORD: atom
   script:
     - mkdir -p .ci_status
     - cd web_hackaton
-    - apt-get update && apt-get -y install sudo
-    - sudo chmod +x ./wait-for
     - ./wait-for mysql:3306 -- ./gradlew check
     - cd ../
     - echo "test unit"
@@ -35,7 +27,13 @@ test unit:
 
 
 docker-build:
+  image: docker:latest
   stage: build
+  variables:
+    DOCKER_DRIVER: overlay
+    SPRING_PROFILES_ACTIVE: gitlab-ci
+  services:
+    - docker:dind
   script:
     - docker build --pull -t "$CI_REGISTRY_IMAGE" -f web_hackaton/Dockerfile .
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
