@@ -21,7 +21,7 @@ test unit:
   script:
     - mkdir -p .ci_status
     - cd web_hackaton
-    - sudo chmod +x ./wait-for
+    - chmod +x ./wait-for
     - ./wait-for mysql:3306 -- ./gradlew check
     - cd ../
     - echo "test unit"
