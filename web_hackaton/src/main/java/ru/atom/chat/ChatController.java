@@ -33,9 +33,9 @@ public class ChatController {
      * curl -X POST -i localhost:8080/chat/login -d "name=I_AM_STUPID"
      */
     @RequestMapping(
-            path = "login",
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        path = "login",
+        method = RequestMethod.POST,
+        consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> login(@RequestParam("name") String name) {
         if (name.length() < 1) {
@@ -66,17 +66,17 @@ public class ChatController {
      * curl -i localhost:8080/chat/chat
      */
     @RequestMapping(
-            path = "chat",
-            method = RequestMethod.GET,
-            produces = MediaType.TEXT_PLAIN_VALUE)
+        path = "chat",
+        method = RequestMethod.GET,
+        produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> chat() {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         List<MessageEntity> messages = session.createCriteria(MessageEntity.class).list();
         session.close();
         return new ResponseEntity<>(messages.stream()
-                .map(object -> object.getBody())
-                .collect(Collectors.joining("\n")),
-                HttpStatus.OK);
+            .map(object -> object.getBody())
+            .collect(Collectors.joining("\n")),
+            HttpStatus.OK);
     }
 
     /**
@@ -101,7 +101,7 @@ public class ChatController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> logout(@RequestParam("name") String name) {
         if (!usersOnline.containsKey(name)) {
-            return ResponseEntity.badRequest().body("User '" + name  + "' was not logged in.");
+            return ResponseEntity.badRequest().body("User '" + name + "' was not logged in.");
         }
         usersOnline.remove(name);
         messages.add("[" + name + "] logged out");
@@ -118,7 +118,7 @@ public class ChatController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> say(@RequestParam("name") String name, @RequestParam("msg") String msg) {
         if (!usersOnline.containsKey(name)) {
-            return ResponseEntity.badRequest().body("User '" + name  + "' was not logged in.");
+            return ResponseEntity.badRequest().body("User '" + name + "' was not logged in.");
         }
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();

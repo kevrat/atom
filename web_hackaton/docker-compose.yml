@@ -6,12 +6,18 @@ services:
     networks:
       - back-tier
     ports:
-      - "80:80"
+      - "80:8080"
+    depends_on:
+      - mysql
+    entrypoint: "./wait-for-it.sh mysql:3306 --strict -- java -jar /services/chat.jar"
   mysql:
     image: mysql:5.5
     restart: always
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=atom
+      - MYSQL_ROOT_PASSWORD=atom
+      - MYSQL_USER=atom
+      - MYSQL_PASSWORD=atom
     volumes:
       - mysql:/var/lib/mysql
     ports:
