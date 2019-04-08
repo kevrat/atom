@@ -21,7 +21,7 @@ test unit:
   script:
     - mkdir -p .ci_status
     - cd web_hackaton
-    - ./gradlew check
+    - ./wait-for-it.sh mysql:3306 --strict -- ./gradlew check
     - cd ../
     - echo "test unit"
     - touch .ci_status/test_unit
