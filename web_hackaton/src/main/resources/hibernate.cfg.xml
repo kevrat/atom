@@ -9,6 +9,7 @@
     <property name="connection.username">atom</property>
     <property name="connection.password">atom</property>
     <property name="hibernate.hbm2ddl.auto">create-drop</property>
+    <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 <!--      <mapping resource="/src/main/java/ru/atom/chat/MessageEntity.hbm.xml"/>-->
       <mapping class="ru.atom.chat.MessageEntity"/>
 <!--      <mapping resource="/src/main/java/ru/atom/chat/UserEntity.hbm.xml"/>-->
