@@ -16,7 +16,7 @@ RUN gradle clean assemble
 FROM openjdk:11-jre
 WORKDIR /home/application/java
 #8
-COPY --from=compile "/home/source/java/wait-for-it.sh" ./wait-for-it.sh
+COPY --from=compile "/home/source/java/wait-for-it.sh" /wait-for-it.sh
 COPY --from=compile "/home/source/java/build/libs/java.jar" /services/chat.jar
 EXPOSE 8080
 #9

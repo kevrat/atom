@@ -47,7 +47,7 @@ public class ChatController {
             return ResponseEntity.badRequest().body("Already logged in:(");
         }
         usersOnline.put(name, name);
-        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
 
         MessageEntity messageEntity = new MessageEntity();
@@ -69,7 +69,7 @@ public class ChatController {
         method = RequestMethod.GET,
         produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> chat() {
-        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
         List<MessageEntity> messages = session.createCriteria(MessageEntity.class).list();
         session.close();
         return new ResponseEntity<>(messages.stream()
@@ -119,7 +119,7 @@ public class ChatController {
         if (!usersOnline.containsKey(name)) {
             return ResponseEntity.badRequest().body("User '" + name + "' was not logged in.");
         }
-        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
 
         MessageEntity messageEntity = new MessageEntity();

@@ -1,0 +1,17 @@
+#1
+FROM gradle:4.5.1-jdk10
+#2
+COPY . /home/source/java
+#3
+WORKDIR /home/source/java
+# Default gradle user is `gradle`. We need to add permission on working directory for gradle to build.
+#4
+USER root
+#5
+RUN chown -R gradle /home/source/java
+#6
+USER gradle
+
+EXPOSE 8080
+#9
+CMD ["gradle", "test"]
