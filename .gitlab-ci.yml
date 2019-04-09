@@ -15,7 +15,7 @@ test unit:
   script:
     - mkdir -p .ci_status
     - cd web_hackaton
-    - ./gradlew check --info
+    - ./gradlew check --stacktrace
     - cd ../
     - echo "test unit"
     - touch .ci_status/test_unit
