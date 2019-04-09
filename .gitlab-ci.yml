@@ -3,9 +3,9 @@ stages:
   - build
 
 test unit:
-  image: gradle:jdk
+  image: gradle:jdk-alpine
   services:
-    - mysql:latest
+    - mysql:5.5
   stage: testing
   variables:
     MYSQL_DATABASE: atom
