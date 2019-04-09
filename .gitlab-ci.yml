@@ -27,7 +27,7 @@ test unit:
   artifacts:
     when: on_failure
     paths:
-    - web_hackaton/build/reports/tests/test/
+      - web_hackaton/build/reports/tests/test/
 
 
 docker-build:
