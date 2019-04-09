@@ -24,7 +24,10 @@ test unit:
   artifacts:
     paths:
       - .ci_status/
-      - atom/web_hackaton/build/reports/tests/test/
+  artifacts:
+    when: on_failure
+    paths:
+    - web_hackaton/build/reports/tests/test/
 
 
 docker-build:
