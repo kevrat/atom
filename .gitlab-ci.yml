@@ -15,8 +15,7 @@ test unit:
   script:
     - mkdir -p .ci_status
     - cd web_hackaton
-    - curl http://mysql:3306
-    - ./gradlew check
+    - ./gradlew check --debug
     - cd ../
     - echo "test unit"
     - touch .ci_status/test_unit
