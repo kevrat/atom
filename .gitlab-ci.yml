@@ -24,6 +24,7 @@ test unit:
   artifacts:
     paths:
       - .ci_status/
+      - atom/web_hackaton/build/reports/tests/test/
 
 
 docker-build:
