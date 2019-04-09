@@ -26,6 +26,8 @@
 </html>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="linkify.min.js"></script>
+<script src="linkify-jquery.min.js"></script>
 <script>
     var host = "localhost";
     var port = 8080;
@@ -39,8 +41,10 @@
         }
 
         $.ajax(settings).done(function (response) {
-            $("#history").html(response.replace(/\n/g, "<br />"))
+                // .replace(/\[.*?\]/, "replacement")
+            $("#history").html(response.replace(/\n/g, "<br />").replace('[',"<b>[").replace(']',']</b>:'))
             $("#history").scrollTop($("#history")[0].scrollHeight);
+            $('#history').linkify();
         }).fail(function (jqXHR, textStatus) {
             console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
         });
