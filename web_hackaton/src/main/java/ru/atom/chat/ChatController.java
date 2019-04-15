@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import org.hibernate.Session;
 
@@ -31,6 +28,7 @@ public class ChatController {
     /**
      * curl -X POST -i localhost:8080/chat/login -d "name=I_AM_STUPID"
      */
+    @CrossOrigin(origins = "http://localhost:8081")
     @RequestMapping(
         path = "login",
         method = RequestMethod.POST,
@@ -64,6 +62,7 @@ public class ChatController {
     /**
      * curl -i localhost:8080/chat/chat
      */
+    @CrossOrigin(origins = "http://localhost:8081")
     @RequestMapping(
         path = "chat",
         method = RequestMethod.GET,
@@ -81,6 +80,7 @@ public class ChatController {
     /**
      * curl -i localhost:8080/chat/online
      */
+    @CrossOrigin(origins = "http://localhost:8081")
     @RequestMapping(
         path = "online",
         method = RequestMethod.GET,
@@ -93,6 +93,7 @@ public class ChatController {
     /**
      * curl -X POST -i localhost:8080/chat/logout -d "name=I_AM_STUPID"
      */
+    @CrossOrigin(origins = "http://localhost:8081")
     @RequestMapping(
         path = "logout",
         method = RequestMethod.POST,
@@ -110,6 +111,7 @@ public class ChatController {
     /**
      * curl -X POST -i localhost:8080/chat/say -d "name=I_AM_STUPID&msg=Hello everyone in this chat"
      */
+    @CrossOrigin(origins = "http://localhost:8081")
     @RequestMapping(
         path = "say",
         method = RequestMethod.POST,
@@ -133,6 +135,7 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
+    @CrossOrigin(origins = "http://localhost:8081")
     @RequestMapping(
         path = "clear",
         method = RequestMethod.DELETE,
