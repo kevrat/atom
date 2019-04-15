@@ -17,8 +17,6 @@ test unit:
     - web_hackaton/gradlew clean build
     - echo "test unit"
     - touch .ci_status/test_unit
-    // - if [ -e ./gradlew ]; then ./gradlew jacocoTestReport;else gradle jacocoTestReport;fi
-    - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   artifacts:
     paths:
       - .ci_status/
