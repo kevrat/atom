@@ -1,29 +1,29 @@
 version: '3.2'
 services:
-  atom:
-    build: ./
-    restart: always
-    networks:
-      - back-tier
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mysql
-    entrypoint: "/wait-for-it.sh mysql:3306 --strict -- java -jar /services/chat.jar"
-  mysql:
-    image: mysql:5.5
-    restart: always
-    environment:
-      - MYSQL_DATABASE=atom
-      - MYSQL_ROOT_PASSWORD=atom
-      - MYSQL_USER=atom
-      - MYSQL_PASSWORD=atom
-    volumes:
-      - mysql:/var/lib/mysql
-    ports:
-      - '3306:3306'
-    networks:
-      - back-tier
+#  atom:
+#    build: ./
+#    restart: always
+#    networks:
+#      - back-tier
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - mysql
+#    entrypoint: "/wait-for-it.sh mysql:3306 --strict -- java -jar /services/chat.jar"
+#  mysql:
+#    image: mysql:5.5
+#    restart: always
+#    environment:
+#      - MYSQL_DATABASE=atom
+#      - MYSQL_ROOT_PASSWORD=atom
+#      - MYSQL_USER=atom
+#      - MYSQL_PASSWORD=atom
+#    volumes:
+#      - mysql:/var/lib/mysql
+#    ports:
+#      - '3306:3306'
+#    networks:
+#      - back-tier
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
@@ -35,7 +35,7 @@ services:
       - back-tier
 volumes:
   mysql:
-  backup-mysql:
+#  backup-mysql:
 networks:
   back-tier:
   # front-tier:

@@ -1,5 +1,9 @@
 package ru.atom.chat;
 
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,7 +27,7 @@ public class ChatController {
     private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
     private Queue<String> messages = new ConcurrentLinkedQueue<>();
-    private Map<String, String> usersOnline = new ConcurrentHashMap<>();
+//    private Map<String, String> usersOnline = new ConcurrentHashMap<>();
 
     /**
      * curl -X POST -i localhost:8080/chat/login -d "name=I_AM_STUPID"
@@ -41,14 +45,22 @@ public class ChatController {
         if (name.length() > 20) {
             return ResponseEntity.badRequest().body("Too long name, sorry :(");
         }
-        if (usersOnline.containsKey(name)) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
+        if (users.stream().filter(o -> o.getNickname().equals(name)).findFirst().isPresent()) {
             return ResponseEntity.badRequest().body("Already logged in:(");
         }
-        usersOnline.put(name, name);
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+//        if (usersOnline.containsKey(name)) {
+//            return ResponseEntity.badRequest().body("Already logged in:(");
+//        }
+//        usersOnline.put(name, name);
+//        Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
 
         MessageEntity messageEntity = new MessageEntity();
+        UserEntity userEntity = new UserEntity();
+        userEntity.setNickname((name));
+        session.save(userEntity);
 
         messageEntity.setBody("[" + name + "] logged in");
         session.save(messageEntity);
@@ -86,8 +98,15 @@ public class ChatController {
         method = RequestMethod.GET,
         produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity online() {
-        String responseBody = String.join("\n", usersOnline.keySet().stream().sorted().collect(Collectors.toList()));
-        return ResponseEntity.ok(responseBody);
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
+        session.close();
+        return new ResponseEntity<>(users.stream()
+            .map(object -> object.getNickname())
+            .collect(Collectors.joining("\n")),
+            HttpStatus.OK);
+//        String responseBody = String.join("\n", usersOnline.keySet().stream().sorted().collect(Collectors.toList()));
+//        return ResponseEntity.ok(responseBody);
     }
 
     /**
@@ -100,10 +119,25 @@ public class ChatController {
         consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> logout(@RequestParam("name") String name) {
-        if (!usersOnline.containsKey(name)) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
+        if (!users.stream().filter(o -> o.getNickname().equals(name)).findFirst().isPresent()) {
             return ResponseEntity.badRequest().body("User '" + name + "' was not logged in.");
         }
-        usersOnline.remove(name);
+//        usersOnline.remove(name);
+        Criteria criteria = session.createCriteria(UserEntity.class);
+        Object user = criteria.add(Restrictions.eq("nickname", name))
+            .uniqueResult();
+        Transaction tx = session.beginTransaction();
+        session.delete(user);
+        Query query = session.createQuery("delete UserEntity where nickname = :name");
+        query.setParameter("name", name);
+//
+        query.executeUpdate();
+        tx.commit();
+//        session.getTransaction().commit();
+
+        session.close();
         messages.add("[" + name + "] logged out");
         return ResponseEntity.ok().build();
     }
@@ -118,10 +152,12 @@ public class ChatController {
         consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> say(@RequestParam("name") String name, @RequestParam("msg") String msg) {
-        if (!usersOnline.containsKey(name)) {
+
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
+        if (!users.stream().filter(o -> o.getNickname().equals(name)).findFirst().isPresent()) {
             return ResponseEntity.badRequest().body("User '" + name + "' was not logged in.");
         }
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
 
         MessageEntity messageEntity = new MessageEntity();
