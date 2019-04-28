@@ -1,10 +1,6 @@
 package ru.atom.chat;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.Basic;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -17,7 +13,8 @@ public class UserEntity {
     private Timestamp lastLogin;
 
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false, updatable = false)
     public int getId() {
         return id;
     }
@@ -36,25 +33,25 @@ public class UserEntity {
         this.nickname = nickname;
     }
 
-    @Basic
-    @Column(name = "password", nullable = false, length = 30)
-    public String getPassword() {
-        return password;
-    }
+//    @Basic
+//    @Column(name = "password", nullable = false, length = 30)
+//    public String getPassword() {
+//        return password;
+//    }
+//
+//    public void setPassword(String password) {
+//        this.password = password;
+//    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Basic
-    @Column(name = "lastLogin", nullable = false)
-    public Timestamp getLastLogin() {
-        return lastLogin;
-    }
-
-    public void setLastLogin(Timestamp lastLogin) {
-        this.lastLogin = lastLogin;
-    }
+//    @Basic
+//    @Column(name = "lastLogin", nullable = false)
+//    public Timestamp getLastLogin() {
+//        return lastLogin;
+//    }
+//
+//    public void setLastLogin(Timestamp lastLogin) {
+//        this.lastLogin = lastLogin;
+//    }
 
     @Override
     public boolean equals(Object o) {
