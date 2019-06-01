@@ -1,11 +1,13 @@
 package ru.atom.chat;
 
+import db.gen.tables.pojos.User;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,11 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("chat")
 public class ChatController {
+
+    @Autowired
+    private UserRepo userRepo;
+    @Autowired
+    private MessageRepo messageRepo;
     private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
     private Queue<String> messages = new ConcurrentLinkedQueue<>();
@@ -45,28 +52,20 @@ public class ChatController {
         if (name.length() > 20) {
             return ResponseEntity.badRequest().body("Too long name, sorry :(");
         }
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
-        if (users.stream().filter(o -> o.getNickname().equals(name)).findFirst().isPresent()) {
-            return ResponseEntity.badRequest().body("Already logged in:(");
+        db.gen.tables.pojos.User user = userRepo.getUser(name);
+        if(user != null){
+            return ResponseEntity.badRequest().body("Already logged in");
+
         }
-//        if (usersOnline.containsKey(name)) {
-//            return ResponseEntity.badRequest().body("Already logged in:(");
-//        }
-//        usersOnline.put(name, name);
-//        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        session.beginTransaction();
 
         MessageEntity messageEntity = new MessageEntity();
+        messageEntity.setBody("[" + name + "] logged in");
         UserEntity userEntity = new UserEntity();
         userEntity.setNickname((name));
-        session.save(userEntity);
 
-        messageEntity.setBody("[" + name + "] logged in");
-        session.save(messageEntity);
-        session.getTransaction().commit();
+        userRepo.createUser(userEntity);
+        messageRepo.createMessage(messageEntity);
 
-        session.close();
         messages.add("[" + name + "] logged in");
         return ResponseEntity.ok().build();
     }
@@ -80,9 +79,7 @@ public class ChatController {
         method = RequestMethod.GET,
         produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> chat() {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        List<MessageEntity> messages = session.createCriteria(MessageEntity.class).list();
-        session.close();
+        List<db.gen.tables.pojos.Message> messages = messageRepo.getMessages();
         return new ResponseEntity<>(messages.stream()
             .map(object -> object.getBody())
             .collect(Collectors.joining("\n")),
@@ -98,11 +95,9 @@ public class ChatController {
         method = RequestMethod.GET,
         produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity online() {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
-        session.close();
+        List<db.gen.tables.pojos.User> users = userRepo.getUsers();
         return new ResponseEntity<>(users.stream()
-            .map(object -> object.getNickname())
+            .map(User::getNickname)
             .collect(Collectors.joining("\n")),
             HttpStatus.OK);
 //        String responseBody = String.join("\n", usersOnline.keySet().stream().sorted().collect(Collectors.toList()));
@@ -119,26 +114,15 @@ public class ChatController {
         consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> logout(@RequestParam("name") String name) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
-        if (!users.stream().filter(o -> o.getNickname().equals(name)).findFirst().isPresent()) {
+        if(!userRepo.deleteUserByNickname(name)){
             return ResponseEntity.badRequest().body("User '" + name + "' was not logged in.");
         }
-//        usersOnline.remove(name);
-        Criteria criteria = session.createCriteria(UserEntity.class);
-        Object user = criteria.add(Restrictions.eq("nickname", name))
-            .uniqueResult();
-        Transaction tx = session.beginTransaction();
-        session.delete(user);
-        Query query = session.createQuery("delete UserEntity where nickname = :name");
-        query.setParameter("name", name);
-//
-        query.executeUpdate();
-        tx.commit();
-//        session.getTransaction().commit();
 
-        session.close();
+        MessageEntity messageEntity = new MessageEntity();
+        messageEntity.setBody("[" + name + "] logged in");
+        messageRepo.createMessage(messageEntity);
         messages.add("[" + name + "] logged out");
+
         return ResponseEntity.ok().build();
     }
 
@@ -153,20 +137,15 @@ public class ChatController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> say(@RequestParam("name") String name, @RequestParam("msg") String msg) {
 
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        List<UserEntity> users = session.createCriteria(UserEntity.class).list();
-        if (!users.stream().filter(o -> o.getNickname().equals(name)).findFirst().isPresent()) {
+        db.gen.tables.pojos.User user = userRepo.getUser(name);
+        if(user == null){
             return ResponseEntity.badRequest().body("User '" + name + "' was not logged in.");
         }
-        session.beginTransaction();
 
         MessageEntity messageEntity = new MessageEntity();
 
         messageEntity.setBody("[" + name + "]: " + msg);
-        session.save(messageEntity);
-        session.getTransaction().commit();
-
-        session.close();
+        messageRepo.createMessage(messageEntity);
         messages.add("[" + name + "]: " + msg);
         return ResponseEntity.ok().build();
     }

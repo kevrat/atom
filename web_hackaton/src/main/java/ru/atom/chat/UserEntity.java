@@ -4,17 +4,12 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
-@Entity
-@Table(name = "user", schema = "atom", catalog = "")
 public class UserEntity {
     private int id;
     private String nickname;
     private String password;
     private Timestamp lastLogin;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false, updatable = false)
     public int getId() {
         return id;
     }
@@ -23,8 +18,6 @@ public class UserEntity {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "nickname", nullable = false, length = 20)
     public String getNickname() {
         return nickname;
     }
@@ -33,15 +26,15 @@ public class UserEntity {
         this.nickname = nickname;
     }
 
-//    @Basic
-//    @Column(name = "password", nullable = false, length = 30)
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    public void setPassword(String password) {
-//        this.password = password;
-//    }
+    @Basic
+    @Column(name = "password", nullable = false, length = 30)
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
 //    @Basic
 //    @Column(name = "lastLogin", nullable = false)

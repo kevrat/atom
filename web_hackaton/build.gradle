@@ -1,6 +1,8 @@
 plugins {
     id 'org.springframework.boot' version '2.0.0.RELEASE'
     id 'antlr'
+    id 'nu.studer.jooq' version '3.0.3'
+    id "org.flywaydb.flyway" version "5.2.4"
 //    id "io.spring.dependency-management" version "1.0.7.RELEASE"
 }
 
@@ -9,10 +11,17 @@ repositories {
 }
 
 apply plugin: 'java'
-apply plugin: 'checkstyle'
+apply plugin: 'idea'
+//apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'nu.studer.jooq'
+apply plugin: "org.flywaydb.flyway"
 //apply plugin: "io.spring.dependency-management"
+
+ext['jooq.version'] = '3.11.9'
+//sourceCompatibility = 1.8
+//targetCompatibility = 1.8
 
 dependencies {
 //    compile group: 'javax.persistence', name: 'persistence-api'
@@ -22,7 +31,14 @@ dependencies {
     compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
     compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
     compile group: 'javax.activation', name: 'activation', version: '1.1.1'
-    compile 'mysql:mysql-connector-java:5.1.34'
+//    compile 'mysql:mysql-connector-java:5.1.34'
+    // should be compatible with mysql 5.5 and up.
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.12'
+    jooqRuntime group: 'mysql', name: 'mysql-connector-java', version: '8.0.12'
+    compile group: 'org.jooq', name: 'jooq', version: '3.11.9'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jooq', version: '2.0.0.RELEASE'
+//    compile('org.jooq:jooq-codegen:3.9.2')
+//    compile 'org.jooq:jooq:3.8.9'
     compile "org.hibernate:hibernate-core:5.0.1.Final"
     compile "org.hibernate:hibernate-entitymanager:5.0.1.Final"
 //    compile group: 'javax.persistence', name: 'persistence-api'
@@ -42,11 +58,11 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.0.RELEASE'
 }
 
-checkstyle {
-    ignoreFailures = false
-    toolVersion = '7.6.1'
-    configFile = new File('config/checkstyle/checkstyle.xml')
-}
+//checkstyle {
+//    ignoreFailures = false
+//    toolVersion = '7.6.1'
+//    configFile = new File('config/checkstyle/checkstyle.xml')
+//}
 jacocoTestReport {
     reports {
         xml.enabled true
@@ -63,3 +79,55 @@ test {
 jacoco {
     toolVersion = "0.8.2"
 }
+
+jooq {
+    chat(sourceSets.main) {
+        jdbc {
+            driver = 'com.mysql.jdbc.Driver'
+            url = 'jdbc:mysql://localhost:3306/atom'
+            user = 'atom'
+            password = 'atom'
+        }
+        generator {
+            name = 'org.jooq.codegen.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.meta.mysql.MySQLDatabase'
+                inputSchema = 'atom'
+                excludes = 'flyway_schema_history' // don't need to map flyway table
+
+//                forcedTypes {
+//                    forcedType {
+//                        name = 'BOOLEAN'
+//                        types = 'tinyint'
+//                    }
+//                }
+            }
+            generate {
+                relations = true
+                deprecated = false
+                records = true
+                immutablePojos = true
+                fluentSetters = true
+            }
+            target {
+                packageName = 'db.gen'
+                directory = 'src/main/generated/java'
+            }
+        }
+    }
+}
+
+flyway {
+    url = 'jdbc:mysql://localhost:3306/atom'
+    user = 'atom'
+    password = 'atom'
+//    schemas = ['atom']
+//    baselineOnMigrate = true
+    locations = ["filesystem:$project.projectDir/src/main/resources/db/migration"]
+}
+
+generateChatJooqSchemaSource.dependsOn flywayMigrate
+test.dependsOn flywayClean
