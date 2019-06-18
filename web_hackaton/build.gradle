@@ -20,8 +20,8 @@ apply plugin: "org.flywaydb.flyway"
 //apply plugin: "io.spring.dependency-management"
 
 ext['jooq.version'] = '3.11.9'
-//sourceCompatibility = 1.8
-//targetCompatibility = 1.8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
 //    compile group: 'javax.persistence', name: 'persistence-api'
